@@ -9,27 +9,24 @@ private:
     struct Node
     {
         T data;
-        int height;          
-        Node* left;
-        Node* right;
+        int height;
+        Node *left;
+        Node *right;
 
-        Node(const T& data)
-            : data(data), height(1), left(nullptr), right(nullptr) {}
+        Node(const T &data) : data(data), height(1), left(nullptr), right(nullptr) {}
     };
 
-    Node* root;  
+    Node *root;
 
 public:
     tree() : root(nullptr) {}
 
-    
-    void insert(const T& data)
+    void insert(const T &data)
     {
         root = addToTree(root, data);
     }
 
-    
-    bool search(const T& item)
+    bool search(const T &item)
     {
         return searchNode(root, item);
     }
@@ -39,64 +36,139 @@ public:
         printTree(root, "", true);
     }
 
-private:
+    void deleteNode(T data)
+    {
+        root = delete_entry(root, data);
+    }
 
-    int getBalance(Node* node)
+private:
+    int getBalance(Node *node)
     {
         return (getHeight(node->left) - getHeight(node->right));
     }
 
-    Node* rotateLeft(Node *z)
+    Node *rotateLeft(Node *z)
     {
-                //       z                               y
-                //      / \                       ->ls /   \
-                //     T1   y     left Rotate         z      x
-                //         / \   - - - - - - - ->   / \ <-rs   / \
+        //                z                               y
+        //               / \                       ->ls  / \
+                //     T1   y     left Rotate          z    x
+        //                 / \   - - - - - - - ->   / \ <-rs/ \
                 //      T2    X                     T1  T2 T3  T4
-                //           / \ 
+        //                   / \ 
                 //          T3  T4
-    Node* y = z->right;
-    Node* T2 = y->left;
+        Node *y = z->right;
+        Node *T2 = y->left;
 
-    y->left = z;
-    z->right = T2;
+        y->left = z;
+        z->right = T2;
 
+        z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
+        y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
 
-    z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
-    y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
-
-    return y; 
+        return y;
     }
 
-    Node* rotateRight(Node *z)
+    Node *rotateRight(Node *z)
     {
-                //       z                               y
-                //      / \                            /    \ <-right side
-                //     y   T4     Right Rotate       x        z
-                //    / \       - - - - - - - ->    / \ ls-> / \
-                //   x   T3                        T1  T2 T3  T4
-                //  / \
-                // T1  T2
-    Node* y = z->left;
-    Node* T3 = y->right;
+        //       z                               y
+        //      / \                            /    \ <-right side
+        //     y   T4     Right Rotate       x        z
+        //    / \       - - - - - - - ->    / \ ls-> / \
+        //   x   T3                        T1  T2 T3  T4
+        //  / \
+        // T1  T2
+        Node *y = z->left;
+        Node *T3 = y->right;
 
-    y->right = z;
-    z->left = T3;
+        y->right = z;
+        z->left = T3;
 
-    
-    z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
-    y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
+        z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
+        y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
 
-    return y; 
+        return y;
     }
-    void printTree(Node* node, std::string indent, bool last) {
-        if (node != nullptr) {
+
+    Node *AVL(Node *node)
+    {
+        // //LL left side of left branch
+        // if(getBalance(node) > 1 && data < node -> left -> data)
+        // {
+        //     return rotateRight(node);
+
+        // }
+        // // RR right side of right branch
+        // if(getBalance(node) < -1 && data > node -> right -> data)
+        // {
+        //     return rotateLeft(node);
+        // }
+
+        // //LR left side of right branch
+        // if(getBalance(node) > 1 && data > node -> left -> data)
+        // {
+        //     node -> left = rotateLeft(node);
+        //     return rotateRight(node);
+        // }
+
+        // // RL right side of right branch
+        // if(getBalance(node) < -1 && data < node -> right -> data)
+        // {
+        //     node -> right = rotateRight(node);
+        //     return rotateLeft(node);
+        // }
+
+        // return node;
+
+        // Above code can cause crashes due fragile cases of checking data inputs
+
+        if (!node)
+            return node;
+
+        int balance = getBalance(node);
+
+        // Left heavy
+        if (balance > 1)
+        {
+            // LL
+            if (getBalance(node->left) >= 0)
+                return rotateRight(node);
+            // LR
+            else
+            {
+                node->left = rotateLeft(node->left);
+                return rotateRight(node);
+            }
+        }
+
+        // Right heavy
+        if (balance < -1)
+        {
+            // RR
+            if (getBalance(node->right) <= 0)
+                return rotateLeft(node);
+            // RL
+            else
+            {
+                node->right = rotateRight(node->right);
+                return rotateLeft(node);
+            }
+        }
+
+        return node;
+    }
+    void printTree(Node *node, std::string indent, bool last)
+    {
+        if (node != nullptr)
+        {
             std::cout << indent;
 
-            if (last) {
+            if (last)
+            {
                 std::cout << "R----";
                 indent += "     ";
-            } else {
+            }
+            else
+            {
                 std::cout << "L----";
                 indent += "|    ";
             }
@@ -108,19 +180,17 @@ private:
         }
     }
 
-
-    int getHeight(Node* node)
+    int getHeight(Node *node)
     {
         return node ? node->height : 0;
     }
 
-    Node* createNode(const T& data)
+    Node *createNode(const T &data)
     {
         return new Node(data);
     }
 
-
-    Node* addToTree(Node* node, T data)
+    Node *addToTree(Node *node, T data)
     {
         if (!node)
             return createNode(data);
@@ -132,43 +202,15 @@ private:
             node->right = addToTree(node->right, data);
 
         else
-            return node; 
+            return node;
 
-    
         node->height = 1 + std::max(getHeight(node->left),
                                     getHeight(node->right));
-        //LL left side of left branch
-        if(getBalance(node) > 1 && data < node -> left -> data)
-        {
-            return rotateRight(node);
 
-        }
-        // RR right side of right branch
-        if(getBalance(node) < -1 && data > node -> right -> data)
-        {
-            return rotateLeft(node);
-        }
-
-        //LR left side of right branch
-        if(getBalance(node) > 1 && data > node -> left -> data)
-        {
-            node -> left = rotateLeft(node);
-            return rotateRight(node);
-        }
-
-        // RL right side of right branch
-        if(getBalance(node) < -1 && data < node -> right -> data)
-        {
-            node -> right = rotateRight(node);
-            return rotateLeft(node);
-        }
-
-
-         return node;
+        return AVL(node);
     }
 
-    
-    bool searchNode(Node* node, const T& item)
+    bool searchNode(Node *node, const T &item)
     {
         if (!node)
             return false;
@@ -180,5 +222,67 @@ private:
             return searchNode(node->left, item);
         else
             return searchNode(node->right, item);
+    }
+
+    Node *delete_entry(Node *node, T data)
+    {
+        if (!node)
+            return node;
+
+        if (data < node->data)
+            node->left = delete_entry(node->left, data);
+
+        else if (data > node->data)
+            node->right = delete_entry(node->right, data);
+
+        else
+        {
+            // if(!node -> right || !node -> left) //check if node has 0 or 1 child
+            // {
+            //     Node *temp = node -> right? node -> right : node -> left; //assign temp that node to replace later
+
+            //     if(!temp) // In case no children are there temp si `nullptr` "Node is a leaf node"
+            //     {
+            //         temp = node;
+            //         node = nullptr;
+            //     }
+
+            //     else
+            //         node = temp; // this copies the contents or the single child we assigned temp in line 210
+
+            //     delete temp; // Discard temp
+            // }
+            // If you can fix above code please do so
+            if (!node->left) // only right chld or no child
+            {
+                Node *temp = node->right;
+                delete node;
+                return temp;
+            }
+            else if (!node->right) // only left child
+            {
+                Node *temp = node->left;
+                delete node;
+                return temp;
+            }
+            else // The node has two child nodes
+            {
+                Node *temp = node->right;
+
+                while (temp->left)
+                    temp = temp->left;
+
+                node->data = temp->data;
+                node->right = delete_entry(node->right, temp->data);
+            }
+        }
+        if (!node)
+            return node;
+
+        node->height = 1 + std::max(getHeight(node->right), getHeight(node->left));
+
+        // return after applying AVL
+        return AVL(node);
+        // return AVL(node, node->data); working without AVL
     }
 };
