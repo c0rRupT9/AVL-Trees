@@ -1,23 +1,17 @@
 #include <iostream>
-#include "tree.cpp"
+#include "tree.hpp"
 
 
 int main()
 {
     tree<int> Tree;
+    int input, i=0;
 
-    Tree.insert(5);
-    Tree.insert(10);
-    Tree.insert(7);
-    Tree.insert(8);
-
-    if(Tree.search(10))
+    while(i < 10)
     {
-        std::cout << "Found";
-    }
-    if(!Tree.search(11))
-    {
-        std::cout << "Not Found";
+        Tree.insert(i);
+        Tree.print();
+        i++;
     }
     
     return 0;
