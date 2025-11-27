@@ -72,8 +72,8 @@ private:
     {
         if(!node) return;
         
-        deleteTree(temp -> right);
-        deleteTree(temp -> left);
+        deleteTree(node -> right);
+        deleteTree(node -> left);
         delete node;
     }
     int getBalance(Node *node)
