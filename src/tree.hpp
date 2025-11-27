@@ -19,7 +19,32 @@ private:
     Node *root;
 
 public:
+
     tree() : root(nullptr) {}
+    ~tree() { deleteTree(root); }
+
+    int numberOfLeaves()
+    {
+        return countLeaves(root);
+    }
+    int numberOfNodes()
+    {
+        return countNodes(root);
+    }
+    T findMax()
+    {
+        Node *temp = root;
+        while(temp -> right)
+        temp = temp -> right;
+        return temp -> data;
+    }
+    T findMin()
+    {
+        Node* temp = root;
+        while(temp -> left)
+        temp = temp -> left;
+        return temp -> data;
+    }
 
     void insert(const T &data)
     {
@@ -42,9 +67,29 @@ public:
     }
 
 private:
+
+    void deleteTree(Node* node)
+    {
+        if(!node) return;
+        
+        deleteTree(temp -> right);
+        deleteTree(temp -> left);
+        delete node;
+    }
     int getBalance(Node *node)
     {
         return (getHeight(node->left) - getHeight(node->right));
+    }
+    int countLeaves(Node *node)
+    {
+        if(!node) return 0;
+        else if(!node -> right && !node -> left) return 1;
+        return countLeaves(node -> right) + countLeaves(node -> left);
+    }
+    int countNodes(Node* node)
+    {
+        if(!node) return 0;
+        return 1 + countNodes(node -> right) + countNodes(node -> left);
     }
 
     Node *rotateLeft(Node *z)
@@ -269,7 +314,7 @@ private:
             {
                 Node *temp = node->right;
 
-                while (temp->left)
+                while (temp->left) // find the succesor of the node
                     temp = temp->left;
 
                 node->data = temp->data;
