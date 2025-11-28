@@ -23,6 +23,14 @@ public:
     tree() : root(nullptr) {}
     ~tree() { deleteTree(root); }
 
+    int treeHeight()
+    {
+        return root -> height;
+    }
+    int rootValue()
+    {
+        return root -> data;
+    }
     int numberOfLeaves()
     {
         return countLeaves(root);
