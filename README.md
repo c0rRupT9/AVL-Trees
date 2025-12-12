@@ -9,7 +9,7 @@ Simple trees and AVL implemented using C++
 ```
 To compile the code
 ```bash
-C++ main.cpp -I ./include/tree.hpp -o trees.exe
+C++ main.cpp -o trees.exe
 ```
 To run enter
 ```bash
