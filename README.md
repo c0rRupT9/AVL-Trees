@@ -1,6 +1,9 @@
 # AVL-Trees
 Simple trees and AVL implemented using C++ 
 
+Also there are string specific functions in ``tree.hpp`` check them out too. These function only work if tree called using 
+``tree<std::string, any>``.
+
 ## **Run the code**
 
 ```bash
