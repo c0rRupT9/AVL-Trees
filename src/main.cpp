@@ -1,169 +1,207 @@
+// To report bugs mail me at corrupt.dev.git@gmail.com
+#include "../include/tree.hpp"
 #include <iostream>
-#include <random>
+#include <algorithm>
+#include <fstream>
+#include <vector>
+#include <sstream>
+#include <string>
 #include <chrono>
-#include "tree.hpp"
-const int MAX_VAL = 400;
+#include <cmath>
 
-int number(int num)
+// Vector was used here to compare speeds only
+// If you want to speed the code up directly input the key and vlaue into the tree
+
+
+std::vector<std::pair<std::string, std::string>> dict;
+std::string path = "../documents/dictionary.txt"; // please change it according to your needs
+
+bool isWordChar(char c) { return std::isalpha(static_cast<unsigned char>(c)) || c == '-'; }
+
+bool isNewEntry(const std::string &line)
 {
-    int seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::mt19937 mt(seed);
-    std::uniform_int_distribution distance (0, num -1);
-    return distance(mt);
+    if (line.empty()) return false;
+    if (!std::isalpha((unsigned char)(line[0]))) return false;
+
+    size_t i = 0;
+    while (i < line.size() && isWordChar(line[i])) ++i;
+
+    if (i == line.size()) return true;
+    if (line[i] == ' ') return true;
+    if (std::ispunct((unsigned char)(line[i]))) return true;
+    return false;
 }
+
+void readFile()
+{
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << path << "\n";
+        return;
+    }
+
+    std::string line;
+    std::string currentKey, currentValue;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty()) continue;
+
+        if (isNewEntry(line))
+        {
+            if (!currentKey.empty()) dict.emplace_back(currentKey, currentValue);
+
+            std::istringstream ss(line);
+            ss >> currentKey;
+            std::string rest;
+            std::getline(ss, rest);
+            if (!rest.empty() && rest.front() == ' ') rest.erase(0,1);
+            currentValue = rest;
+        }
+        else
+        {
+            if (!currentKey.empty())
+            {
+                if (!currentValue.empty()) currentValue += ' ';
+                currentValue += line;
+            }
+        }
+    }
+
+    if (!currentKey.empty()) dict.emplace_back(currentKey, currentValue);
+    file.close();
+}
+
+void insertToTree(const std::vector<std::pair<std::string, std::string>>& keys, tree<std::string, std::string>& object)
+{
+    for (const auto &p : keys) object.insert(p.first, p.second);
+}
+
+
 
 int main()
 {
-    tree<int> Tree;
-//insert values upto MAX_VAL 400 times
-// Test for Random unsequenced insertion 0-399 
-// the loop is run 800 times since random number generator can have duplications
-// causing the tree to not exactly have 400 nodes
-for (int i = 0; i < 800; i++)
-{
-    Tree.insert(number(MAX_VAL));
-}
+    tree<std::string, std::string> Tree;
 
-//Results: 
-/*Obtained values:
-Nodes: 351
-Leaves: 155
-Height: 10
-Root: 249
+    std::cout << "Getting things ready! \n Initializing...\n Starting Phase 1 (reading the file)\n";
+    auto start = std::chrono::high_resolution_clock::now();
 
-Expected values:
-Leaves: 176
-Height: 11.8595
-Root: 200
+    readFile();
 
-Divergence:
-Leaves divergence: 11.9318 %
-Height divergence: 15.6792 %
-Root divergence: 24.5 %
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> timeToInit = end - start;
+    std::cout << "Phase 1 completed in " << timeToInit.count() << " seconds\n";
+    std::cout << "Entries parsed: " << dict.size() << "\n";
 
-Total loss: 18.5272 %*/
+    std::cout << "Starting Phase 2 (inserting values into the tree)\n";
+    start = std::chrono::high_resolution_clock::now();
+    insertToTree(dict, Tree);
+    end = std::chrono::high_resolution_clock::now();
+    timeToInit = end - start;
+    std::cout << "Phase 2 completed in " << timeToInit.count() << " seconds\n\n";
 
-
-// Test for sequential linear insertion set
-// for(int i = 0; i < 400; i++)
-//     Tree.insert(i);
-
-// Results: 
-/*Obtained values:
-Nodes: 400
-Leaves: 200
-Height: 9
-Root: 255
-
-Expected values:
-Leaves: 200.5
-Height: 12.1295
-Root: 200
-
-Divergence:
-Leaves divergence: 0.249377 %
-Height divergence: 25.8008 %
-Root divergence: 27.5 %
-
-Total loss: 14.2088 %*/
-    Tree.print();
     int N = Tree.numberOfNodes();
-    int obtainedNodes = Tree.numberOfNodes();
+    int obtainedNodes = N;
     int obtainedLeaves = Tree.numberOfLeaves();
     int obtainedHeight = Tree.treeHeight();
-    int obtainedRoot = Tree.rootValue();
+    std::string obtainedRoot = Tree.rootValue();
 
-    // ---- Expected values (theoretical for balanced AVL) ----
-    double expectedLeaves = (N + 1) / 2.0;           // leaves half nodes
-    double expectedHeight = 1.44 * log2(N + 2) - 0.328; // AVL max height
-    double expectedRoot = MAX_VAL / 2.0;               // median-ish for uniform random
+    double expectedLeaves = (N + 1) / 2.0;
+    double expectedHeight = N > 0 ?  std::log2(N): 0.0;
+    std::string expectedRoot = dict[(N/2)].first;
 
-    // ---- Compute divergence ----
     double leavesDivergence = std::abs(expectedLeaves - obtainedLeaves);
     double heightDivergence = std::abs(expectedHeight - obtainedHeight);
-    double rootDivergence = std::abs(expectedRoot - obtainedRoot);
 
-    double totalLoss = leavesDivergence + heightDivergence + rootDivergence;
-    double idealTotal = expectedHeight + expectedLeaves + expectedRoot;
+    double totalLoss = leavesDivergence + heightDivergence;
+    double idealTotal = expectedHeight + expectedLeaves;
 
-    // ---- Output ----
+
+    std::cout << "\n AVL Performance Analysis \n";
     std::cout << "Obtained values:\n";
-    std::cout << "Nodes: " << obtainedNodes << "\n";
-    std::cout << "Leaves: " << obtainedLeaves << "\n";
-    std::cout << "Height: " << obtainedHeight << "\n";
-    std::cout << "Root: " << obtainedRoot << "\n\n";
+    std::cout << "Nodes: " << obtainedNodes 
+    << "\nLeaves: " << obtainedLeaves 
+    << "\nHeight: " << obtainedHeight 
+    << "\nRoot: " << obtainedRoot << "\n\n";
 
-    std::cout << "Expected values:\n";
-    std::cout << "Leaves: " << expectedLeaves << "\n";
-    std::cout << "Height: " << expectedHeight << "\n";
-    std::cout << "Root: " << expectedRoot << "\n\n";
+    std::cout << "Expected values:\nLeaves: " << expectedLeaves << "\nHeight: " << expectedHeight << "\nRoot: " << expectedRoot << "\n\n";
 
-    std::cout << "Divergence:\n";
-    std::cout << "Leaves divergence: " << (leavesDivergence/expectedLeaves)*100 <<" %" << "\n";
-    std::cout << "Height divergence: " << (heightDivergence/expectedHeight)*100 <<" %" << "\n";
-    std::cout << "Root divergence: " << (rootDivergence/expectedRoot)*100 <<" %" << "\n\n";
+    if (expectedLeaves > 0)
+        std::cout << "Leaves divergence: " << (leavesDivergence/expectedLeaves)*100 <<" %\n";
+    if (expectedHeight > 0)
+        std::cout << "Height divergence: " << (heightDivergence/expectedHeight)*100 <<" %\n\n";
 
-    std::cout << "Total loss: " << (totalLoss/idealTotal)*100 << " %" << "\n";
+    if (idealTotal > 0)
+        std::cout << "Total loss: " << (totalLoss/idealTotal)*100 << " %\n";
 
+    std::cout << "Estimated search iterations (log2 nodes): " << (obtainedNodes>0 ? std::log2(obtainedNodes) : 0) << "\n";
+    std::cout << "Real iterations can range from " << 1 << " to " << obtainedHeight <<  "\n\n";
 
+    std::string value = "";
+    int input;
+    std::vector<std::string> nodes;
+    // To print the complete Tree use 
+    //Tree.print();
+    // Please avoid it, can cause bottlenecks. 
+    while(true)
+    {
 
+        
+        std::cout << "\n=====================================\n";
+        std::cout << "       AVL TREE BASED DICTIONARY         \n";
+        std::cout << "=====================================\n";
 
+        
+        std::cout << "Please select an option (enter the integer):\n";
+        std::cout << " 1. Search a Value\n";
+        std::cout << " 2. Search with a Specific Prefix\n";
+        std::cout << " 3. Delete a Node\n";
+        std::cout << " 4. Exit\n\n";
+
+        
+        
+        std::cout << "-------------------------------------\n";
+        std::cout << "Enter choice: ";
+
+        if(!(std::cin >> input))
+        { 
+            std::cout << "Please!\n";
+            break;
+        }
+        switch (input)
+        {
+        case 1:
+            while(true)
+            {
+                std::cout << "Please enter the word to search for (Exit: quit()): ";
+                if (!(std::cin >> value)) break;
+                if (value == "quit()") break;
+                Tree.searchWord(value);
+            }
+            break;
+        case 2:
+            std::cout << "Please enter the prefix: ";
+            if(!(std::cin >> value)) break;
+            nodes = Tree.vectorWithPrefix(value);
+            for(auto &a: nodes) std::cout << a << " ";
+            std::cout << std::endl;
+            break;
+
+        case 3:
+            std::cout << "please enter The word: ";
+            if(!(std::cin >> value)) break;
+            Tree.deleteNode(value);
+            break;
+
+        case 4:
+            std::cout << "Exitting. Thankyou...\n";
+            return 0;
+            break;
+        default:
+            std::cout << "Please enter a valid value!" << std::endl;
+            break;
+        }
+
+    }
     return 0;
-
-// Tree.insert(50);
-// Tree.insert(30);
-// Tree.insert(20);
-// Tree.insert(40);
-// Tree.insert(70);
-// Tree.insert(60);
-// Tree.insert(80);
-
-// Tree.insert(5);
-// Tree.insert(2);
-// Tree.insert(8);
-// Tree.insert(1);
-// Tree.insert(3);
-// Tree.insert(7);
-// Tree.insert(9);
-
-// Tree.insert(50);
-// Tree.insert(30);
-// Tree.insert(70);
-// Tree.insert(20);
-// Tree.insert(40);
-// Tree.insert(60);
-// Tree.insert(80);
-// Tree.insert(10);
-// Tree.insert(25);
-// Tree.insert(35);
-// Tree.insert(45);
-// Tree.insert(55);
-// Tree.insert(65);
-// Tree.insert(75);
-// Tree.insert(85);
-
-// Tree.insert(10);
-// Tree.insert(5);
-// Tree.insert(7);
-// Tree.insert(10);
-// Tree.insert(5);
-// Tree.insert(3);
-
-// Tree.insert(10);
-// Tree.insert(8);
-// Tree.insert(9);
-    
-// Tree.insert(1);
-// Tree.insert(2);
-// Tree.insert(3);
-// Tree.insert(4);
-// Tree.insert(5);
-// Tree.insert(6);
-// Tree.insert(7);
-// Tree.insert(8);
-// Tree.print();
-// Tree.deleteNode(5);
-// Tree.print();
-// Tree.deleteNode(4);
-// Tree.print();
 }
