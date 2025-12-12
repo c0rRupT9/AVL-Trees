@@ -4,7 +4,7 @@ Simple trees and AVL implemented using C++
 ## **Run the code**
 
 ```bash
-  git clone [link](https://github.com/c0rRupT9/AVL-Trees.git)
+  git clone https://github.com/c0rRupT9/AVL-Trees.git
   && cd AVL-Trees/src
 ```
 To compile the code
