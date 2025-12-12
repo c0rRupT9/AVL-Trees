@@ -156,7 +156,9 @@ int main()
         std::cout << " 1. Search a Value\n";
         std::cout << " 2. Search with a Specific Prefix\n";
         std::cout << " 3. Delete a Node\n";
-        std::cout << " 4. Exit\n\n";
+        std::cout << " 4. (Debug) Print the Tree, to specific depth(n)\n";
+        std::cout << " 5. Exit\n\n";
+
 
         
         
@@ -193,9 +195,15 @@ int main()
             Tree.deleteNode(value);
             break;
 
-        case 4:
+        case 5:
             std::cout << "Exitting. Thankyou...\n";
             return 0;
+            break;
+        case 4:
+            int n;
+            std::cout << "Please enter the value of n: enter -1 to print full tree: ";
+            std::cin >> n;    
+            Tree.print(n);
             break;
         default:
             std::cout << "Please enter a valid value!" << std::endl;
