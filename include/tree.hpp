@@ -1,11 +1,8 @@
+#pragma once
+
 #include <iostream>
-#include <algorithm>
-#include <fstream>
 #include <vector>
-#include <sstream>
 #include <string>
-#include <chrono>
-#include <cmath>
 
 template <class T, class F>
 class tree
@@ -202,8 +199,8 @@ private:
         y->left = z;
         z->right = C2;
 
-        z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
-        y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
+        z->height = 1 + ((getHeight(z->left) > getHeight(z->right)) ? getHeight(z->left) : getHeight(z->right));
+        y->height = 1 + ((getHeight(z->left) > getHeight(z->right)) ? getHeight(z->left) : getHeight(z->right));
 
         return y;
     }
@@ -225,8 +222,8 @@ private:
         y->right = z;
         z->left = C2;
 
-        z->height = 1 + std::max(getHeight(z->left), getHeight(z->right));
-        y->height = 1 + std::max(getHeight(y->left), getHeight(y->right));
+        z->height = 1 + ((getHeight(z->left) > getHeight(z->right)) ? getHeight(z->left) : getHeight(z->right));
+        y->height = 1 + ((getHeight(z->left) > getHeight(z->right)) ? getHeight(z->left) : getHeight(z->right));
 
         return y;
     }
@@ -311,7 +308,7 @@ private:
             return node;
         }
 
-        node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
+        node->height = 1 + ((getHeight(node->left) > getHeight(node->right)) ? getHeight(node->left) : getHeight(node->right));
         return AVL(node);
     }
 
@@ -351,7 +348,7 @@ private:
                 }
             }
 
-            node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
+            node->height = 1 + ((getHeight(node->left) > getHeight(node->right)) ? getHeight(node->left) : getHeight(node->right));
             return AVL(node);
         }
         else
@@ -382,7 +379,7 @@ private:
                 }
             }
 
-            node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
+            node->height = 1 + ((getHeight(node->left) > getHeight(node->right)) ? getHeight(node->left) : getHeight(node->right));
             return AVL(node);
         }
     }
