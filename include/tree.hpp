@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
+#include <type_traits>
 
 template <class T, class F>
 class tree
@@ -28,6 +30,11 @@ public:
     T rootValue() const { return root ? root->data : T(); }
     int numberOfLeaves() const { return countLeaves(root); }
     int numberOfNodes() const { return countNodes(root); }
+
+    F benchmarkFind(const T &key) const {
+    Node *n = searchNode(root, key);  // Uses exact comparison (private helper is fine if made friend, or make public temporarily)
+    return n ? n->value : F();
+}
 
     T findMax() const
     {
@@ -93,13 +100,17 @@ public:
     }
 
     // This function is only available for trees with type tree<std::string, any>
-    typename std::enable_if<std::is_same<T, std::string>::value, std::vector<std::string>>::type
-    vectorWithPrefix(std::string prefix) const
-    {
+std::vector<std::string> vectorWithPrefix(std::string prefix) const {
+    if constexpr (std::is_same_v<T, std::string>) {
         std::vector<std::string> nodes;
         collectWithPrefix(root, prefix, nodes);
         return nodes;
+    } else {
+        // Optional: throw or static_assert for safety
+        static_assert(std::is_same_v<T, std::string>, "vectorWithPrefix only available for string keys");
+        return {};  // Unreachable
     }
+}
 
 private:
     // This function discards the rules of BST with complexity of O(n)
@@ -131,20 +142,21 @@ private:
         return output;
     }
 
-    typename std::enable_if<std::is_same<T, std::string>::value, Node *>::type
-    searchNodeString(Node *node, const std::string &key) const
-    {
-        if (!node)
-            return nullptr;
-        std::string lowerKey = lowerCase(key);
-        std::string lowerData = lowerCase(node->data);
-        if (lowerData == lowerKey)
-            return node;
-        if (lowerKey > lowerData)
-            return searchNodeString(node->right, key);
-
-        return searchNodeString(node->left, key);
+Node *searchNodeString(Node *node, const std::string &key) const {
+        if constexpr (std::is_same_v<T, std::string>) {
+    if (!node) return nullptr;
+    std::string lowerKey = lowerCase(key);
+    std::string lowerData = lowerCase(node->data);  // This line needs fix too - see below
+    if (lowerData == lowerKey) return node;
+    if (lowerKey > lowerData) return searchNodeString(node->right, key);
+    return searchNodeString(node->left, key);
+    } else {
+        // Optional: throw or static_assert for safety
+        static_assert(std::is_same_v<T, std::string>, "vectorWithPrefix only available for string keys");
+        return {};  // Unreachable
     }
+
+}
 
     bool searchNodeBool(Node *node, const T &item) const
     {

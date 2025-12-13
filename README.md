@@ -69,12 +69,24 @@ int main() {
 ## **Sample Output**
 
 ### Tree Visualization (partial)
-![Tree Visual](image-1.png)
+![Tree Visual](documents/image-1.png)
 
 You can even print the whole tree! 
 
 ## Interactive Menu
-![Menu](image-2.png)
+![Menu](documents/image-2.png)
+
+## Performance vs. std::map (Red-Black Tree) – Integers (Release Mode)
+
+Benchmarks on 100,000 random integers (12-core CPU):
+
+| Operation   | AVL Tree                  | std::map (Red-Black)      | Winner                  |
+|-------------|---------------------------|---------------------------|-------------------------|
+| Insert      | ~254 ns per operation     | ~205 ns per operation     | Red-Black (~20% faster) |
+| Search      | **~50 ns per operation**  | ~138 ns per operation     | **AVL** (~176% faster)  |
+
+![alt text](documents/image.png)
+**AVL shines in search-heavy scenarios** thanks to tighter height bounds (≈1.44 log₂ n vs up to 2 log₂ n).
 
 ## **Contributing**
 Found a bug? Have an improvement? Feel free to:

@@ -1,3 +1,9 @@
+build/
+_deps/
+*.exe
+CMakeCache.txt
+CMakeFiles/
+
 # Prerequisites
 *.d
 
