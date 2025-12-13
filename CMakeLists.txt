@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googlebenchmark)
 
 # Your tree header (adjust path)
 add_library(avl_tree INTERFACE)
-target_include_directories(avl_tree INTERFACE include/)  # Assuming tree.hpp is in include/
+target_include_directories(avl_tree INTERFACE include/)  # Adjust if needed
 
 # Benchmark executable
 add_executable(benchmarks benchmarks/bench.cpp)  # You'll create this file
