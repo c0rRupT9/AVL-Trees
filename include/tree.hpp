@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 
 template <class T, class F>
 class tree
