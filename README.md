@@ -27,7 +27,7 @@ It's not just a basic textbook example — it includes:
 
 ## Performance Example (on ~34k dictionary entries)
 
-![Analysis](https://ibb.co/HD6QNw9X)
+![Analysis](https://i.ibb.co/27xB8Vp5/image.png)
 
 textSearches are **O(log n)** — much faster than linear scan on a vector!
 
@@ -71,12 +71,12 @@ int main() {
 ## **Sample Output**
 
 ### Tree Visualization (partial)
-![visual](https://ibb.co/WWJtRtsj)
+![visual](https://i.ibb.co/Lz75s5vH/image-1.png)
 
 You can even print the whole tree! 
 
 ## Interactive Menu
-![Menu](https://ibb.co/tM0Dbvng)
+![Menu](https://i.ibb.co/ynzq8ZKt/image-2.png)
 
 ## Performance vs. std::map (Red-Black Tree) – Integers (Release Mode)
 
@@ -87,7 +87,7 @@ Benchmarks on 100,000 random integers (12-core CPU):
 | Insert      | ~254 ns per operation     | ~205 ns per operation     | Red-Black (~20% faster) |
 | Search      | **~50 ns per operation**  | ~138 ns per operation     | **AVL** (~176% faster)  |
 
-![Menu](https://ibb.co/zhjK5ssT)
+![Menu](https://i.ibb.co/HD1m277f/Benchmark.png)
 
 **AVL shines in search-heavy scenarios** thanks to tighter height bounds (≈1.44 log₂ n vs up to 2 log₂ n).
 
