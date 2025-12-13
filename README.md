@@ -26,7 +26,9 @@ It's not just a basic textbook example — it includes:
 - **Interactive demo** — Loads a dictionary file and lets you search, prefix-search, delete, and print
 
 ## Performance Example (on ~34k dictionary entries)
-![Analysis](image.png)
+
+![Analysis](https://ibb.co/HD6QNw9X)
+
 textSearches are **O(log n)** — much faster than linear scan on a vector!
 
 ## Quick Start
@@ -69,12 +71,12 @@ int main() {
 ## **Sample Output**
 
 ### Tree Visualization (partial)
-![visual](https://raw.githubusercontent.com/c0rRupT9/AVL-Trees/main/documents/image-1.png)
+![visual](https://ibb.co/WWJtRtsj)
 
 You can even print the whole tree! 
 
 ## Interactive Menu
-![Menu](https://raw.githubusercontent.com/c0rRupT9/AVL-Trees/main/documents/image-2.png)
+![Menu](https://ibb.co/tM0Dbvng)
 
 ## Performance vs. std::map (Red-Black Tree) – Integers (Release Mode)
 
@@ -85,7 +87,7 @@ Benchmarks on 100,000 random integers (12-core CPU):
 | Insert      | ~254 ns per operation     | ~205 ns per operation     | Red-Black (~20% faster) |
 | Search      | **~50 ns per operation**  | ~138 ns per operation     | **AVL** (~176% faster)  |
 
-![Menu](https://raw.githubusercontent.com/c0rRupT9/AVL-Trees/main/documents/image copy.png)
+![Menu](https://ibb.co/zhjK5ssT)
 
 **AVL shines in search-heavy scenarios** thanks to tighter height bounds (≈1.44 log₂ n vs up to 2 log₂ n).
 

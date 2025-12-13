@@ -3,6 +3,7 @@ _deps/
 *.exe
 CMakeCache.txt
 CMakeFiles/
+*.png
 
 # Prerequisites
 *.d
